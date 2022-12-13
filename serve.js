@@ -19,7 +19,7 @@ app.get('/tower', (req, res)=>{
 })
 
 io.on('connection', (socket)=>{
-  console.log('connected')
+  // console.log('connected')
   socket.on("msg", (objs)=>{
     io.emit("msg", objs)
   })

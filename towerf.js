@@ -12,7 +12,8 @@ let died = false;
 
 
 let data = []
-let socket = io.connect("http://192.168.214.161:8081")
+// let socket = io.connect("http://192.168.214.161:8081")
+let socket = io()
 // let socket = io.connect("http://10.20.203.99:8081")
 
 let level = {
@@ -44,13 +45,6 @@ let currStage = 1
 function setup(){
 	createCanvas(600, 600)
 	rectMode(CENTER)
-	// inp = createInput()
-	// inp.position(400, 0)
-	// button = createButton("Play")
-	// button.position(inp.x + inp.width, 0)
-	// button.mousePressed(()=>{
-	// 	socket.emit("name-event", inp.value())
-	// })
 
 }
 

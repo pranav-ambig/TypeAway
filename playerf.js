@@ -8,7 +8,8 @@ let currentIndex = 0
 let cellSize = 30
 
 
-let socket = io.connect("http://192.168.214.161:8081")
+// let socket = io.connect("http://192.168.214.161:8081")
+let socket = io()
 // let socket = io.connect("http://10.20.203.99:8081")
 let dts = []
 
@@ -175,22 +176,55 @@ class Projectile{
 	}
 }
 
-function getTowerPos(){
-			
-	while (true){
-		let pos = createVector(random(0, width), random(0, 400))
-		for (let i=0; i<level.coords.length; i++)
-			console.log(pos.dist(level.coords[i]) > 2*cellSize)
-		return pos
-		// level.coords.forEach(lp=>{
-		// 	if (pos.dist(lp)>2*cellSize)
-		// 		return pos
-		// })
+function isTowerPosValid(pos){
+
+	if (pos.y > 450)
+		return false;
+
+	let isValid = true
+	
+	for (let i=0; i<level.coords.length-1; i++){
+		
+		let curr = level.coords[i].copy()
+		let next = level.coords[i+1].copy()
+	
+		for (let amount=0; amount <1.0; amount += 0.05){
+			curr = p5.Vector.lerp(curr, next, amount)
+			// curr.lerp(next, amount)
+			// console.log(curr.x, curr.y)
+			if (curr.dist(pos)<2*cellSize){
+				isValid = false
+				break;
+			}
+		}
 
 	}
+
+
+	return isValid;
+
 }
 
+function getTowerPos(){
+	
+	let pos = createVector(random(0, width), random(0, height))
+	while (!isTowerPosValid(pos)){
+		pos = createVector(random(0, width), random(0, height))
+	}
+	return pos
 
+}
+
+function testing(){
+	if (isTowerPosValid(createVector(mouseX, mouseY))){
+		stroke("#00ff00")
+	}
+	else {
+		stroke("#ff0000")
+	}
+	strokeWeight(10)
+	line(0, 0, mouseX, mouseY)
+}
 
 function draw(){
 	background("#FFF7E9")
@@ -206,6 +240,9 @@ function draw(){
 	})
 	drawText()
 	comm()
+
+	// testing()
+
 }
 
 function comm(){
