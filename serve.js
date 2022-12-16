@@ -12,6 +12,10 @@ app.get('/player', (req, res)=>{
   // console.log(req.hostname)
 })
 
+app.get('/', (req, res)=>{
+  res.send("Go to /player for player, /tower for tower")
+})
+
 app.get('/tower', (req, res)=>{
   res.sendFile(__dirname+'/forTower.html')
   // io.emit("tower-spawn", req.params["tname"])
@@ -42,6 +46,6 @@ io.on('connection', (socket)=>{
 })
 
 http.listen(port, '0.0.0.0', () => {
-  console.log(`Player: http://192.168.214.161:${port}/player`);
-  console.log(`Tower: http://192.168.214.161:${port}/tower`);
+  // console.log(`Player: http://192.168.214.161:${port}/player`);
+  // console.log(`Tower: http://192.168.214.161:${port}/tower`);
 });
