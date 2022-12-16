@@ -30,15 +30,9 @@ level.coords.forEach(e=>{
 })
 level.coords = temp;
 
-let towerSpawnable = []
-
-for (let i=0; i<level.coords.length; i++){
-	
-}
-
-// console.log(level.coords)
 
 
+let player;
 let currStage = 1
 
 
@@ -59,23 +53,23 @@ function draw(){
 
 	drawLevel()
 	if (data.length > 0){
-		let p = data[0]
+		player = data[0]
 		noStroke()
-		if (!p.died){
+		if (!player.died){
 			fill("#153462")
 		}
 		else {
 			fill("#252A34")
 		}
 		
-		if (p.won){
+		if (player.won){
 			fill("#5F9DF7")
 		}
 		
 		textSize(15)
 		textAlign(CENTER)
-		rect(p.pos.x, p.pos.y, cellSize, cellSize, 6)
-		text(p.health.toString().replace(/0/g, "O"), p.pos.x, p.pos.y+cellSize)
+		rect(player.pos.x, player.pos.y, cellSize, cellSize, 6)
+		text(player.health.toString().replace(/0/g, "O"), player.pos.x, player.pos.y+cellSize)
 
 		data[1].forEach(tower=>{
 			fill("#FF731D")
@@ -159,16 +153,33 @@ function drawText(){
 		currentIndex = 0
 	}
 
-	let x;
-	textSize(60)
-	textFont(font)
-	fill("#5F9DF788")
-	textAlign(LEFT)
-	x = (width/2)-(textWidth(currentWord))/2
-	text(currentWord, x, 500)
+	// let x;
+	// textSize(60)
+	// textFont(font)
+	// fill("#5F9DF788")
+	// textAlign(LEFT)
+	// x = (width/2)-(textWidth(currentWord))/2
+	// text(currentWord, x, 500)
 	
-	fill("#1746A2ff")
-	text(currentWord.slice(0, currentIndex)+'', x, 500)
+	// fill("#1746A2ff")
+	// text(currentWord.slice(0, currentIndex)+'', x, 500)
+
+	let x;
+	
+	if (player){
+		textSize(20)
+		textFont(font)
+		// fill("#5F9DF7aa")
+		fill("#1746A277")
+		textAlign(LEFT)
+		x = player.pos.x-(textWidth(currentWord))/2
+		text(currentWord, x, player.pos.y-20)
+		
+		fill("#1746A2ff")
+		text(currentWord.slice(0, currentIndex)+'', x, player.pos.y-20)
+	}
+
+
 
 
 }

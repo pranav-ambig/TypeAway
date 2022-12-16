@@ -11,7 +11,7 @@ let cellSize = 30
 // let socket = io.connect("http://192.168.214.161:8081")
 let socket = io()
 // let socket = io.connect("http://10.20.203.99:8081")
-let dts = []
+let dts = [] //data to send
 
 
 let level = {
@@ -207,7 +207,7 @@ function isTowerPosValid(pos){
 
 function getTowerPos(){
 	
-	let pos = createVector(random(0, width), random(0, height))
+	let pos = createVector(random(2*cellSize, width-cellSize), random(2*cellSize, height-cellSize))
 	while (!isTowerPosValid(pos)){
 		pos = createVector(random(0, width), random(0, height))
 	}
