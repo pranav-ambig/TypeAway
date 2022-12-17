@@ -45,7 +45,7 @@ io.on('connection', (socket)=>{
 
 })
 
-http.listen(port, '0.0.0.0', () => {
+http.listen(port, 'localhost', () => {
   // console.log(`Player: http://192.168.214.161:${port}/player`);
   // console.log(`Tower: http://192.168.214.161:${port}/tower`);
 });
