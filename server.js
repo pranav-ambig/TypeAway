@@ -45,7 +45,8 @@ io.on('connection', (socket)=>{
 
 })
 
-http.listen(port, '0.0.0.0', () => {
-  console.log(`Player: http://192.168.1.17:${port}/player`);
-  console.log(`Tower: http://192.168.1.17:${port}/tower`);
+http.listen(port, () => {
+  console.log("Server running...")
+  // console.log(`Player: http://192.168.1.17:${port}/player`);
+  // console.log(`Tower: http://192.168.1.17:${port}/tower`);
 });
