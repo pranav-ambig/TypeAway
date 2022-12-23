@@ -2,21 +2,21 @@ const express = require('express');
 const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
-const port = 3000;
+const port = process.env.port || 3000;
 
 
 app.use(express.static(__dirname))
 
-app.get('/api/player', (req, res)=>{
+app.get('/player', (req, res)=>{
   res.sendFile(__dirname+'/forPlayer.html')
   // console.log(req.hostname)
 })
 
-app.get('/api/', (req, res)=>{
+app.get('/', (req, res)=>{
   res.send("Go to /player for player, /tower for tower")
 })
 
-app.get('/api/tower', (req, res)=>{
+app.get('/tower', (req, res)=>{
   res.sendFile(__dirname+'/forTower.html')
   // io.emit("tower-spawn", req.params["tname"])
   // console.log('test', req.params["tname"])
@@ -46,6 +46,6 @@ io.on('connection', (socket)=>{
 })
 
 http.listen(port, '0.0.0.0', () => {
-  // console.log(`Player: http://192.168.214.161:${port}/player`);
-  // console.log(`Tower: http://192.168.214.161:${port}/tower`);
+  console.log(`Player: http://192.168.1.17:${port}/player`);
+  console.log(`Tower: http://192.168.1.17:${port}/tower`);
 });
