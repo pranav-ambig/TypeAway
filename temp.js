@@ -1,21 +1,10 @@
-new p5();
+coords = [[50, 50], [200, 50], [200, 200], [550, 200], [550, 50], [400, 50], [400, 400], [50, 400]]
 
 
-function setup(){
-	createCanvas(400, 400);
-	background(220);
-}
-let x = createVector(100, 200)
-let y = createVector(50, 150)
-let z = p5.Vector.sub(x, y)
-let n = p5.Vector(0, 0)
-function draw(){
-	stroke("#000000")
-	strokeWeight(10)
-	line(0, 0, x.x, x.y)
-	line(0, 0, y.x, y.y)
-	line(y.x, y.y, z.x, z.y)
-}
-
-
-// console.log(x)
+len = 0
+prev = [0, 0]
+coords.forEach((i)=>{
+	len += Math.sqrt((i[0]-prev[0])**2+(i[1]-prev[1])**2)
+	prev = i
+})
+console.log(len)

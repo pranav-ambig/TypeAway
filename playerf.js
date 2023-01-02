@@ -17,8 +17,7 @@ let dts = [] //data to send
 let level = {
 	// coords: [[50, 50],[150, 150],[300,150], [300, 400], [500, 400], [500, 300], [100, 300], [100, 400]]
 	// coords: [[100, 100], [500, 100], [500, 250], [400, 200], [200, 200], [200, 300], [100, 300], [100, 400], [300, 400], [300, 300], [400, 300], [400, 400]] 
-	coords: [[50, 50], [200, 50], [200, 200], [550, 200], [550, 50], [400, 50], [400, 400], [50, 400]]  
-	// coords: [[50, 250],[250, 250],[250, 400], [500, 400]]
+	coords: [[50, 50], [200, 50], [200, 200], [550, 200], [550, 50], [400, 50], [400, 400], [50, 400]]
 }
 
 let temp = []
@@ -28,29 +27,27 @@ level.coords.forEach(e=>{
 })
 level.coords = temp;
 
-let towerSpawnable = []
-
-for (let i=0; i<level.coords.length; i++){
-	
-}
-
-// console.log(level.coords)
-
 
 let obstacles = []
 let towers = []
 let currStage = 1
 let towerDict = {}
+let playerVel = 10
+let projectileDamage = 0;
 
 function setup(){
 	createCanvas(600, 600)
 	rectMode(CENTER)
 	player = new Player()
+	// updateProjectileDamage()
 	// for (let i=0; i<1; i++){
 	// 	towers.push(new Tower(random(0, width), random(0, 400)))
 	// }
 	// keyTyped({key: 'n'})
 }
+
+
+
 class Player{
 	constructor(){
 		this.health = 100
@@ -94,7 +91,7 @@ class Player{
 		let vel = command.copy()
 		vel.sub(this.pos)
 		vel.normalize()
-		this.pos.add(vel.mult(10))
+		this.pos.add(vel.mult(playerVel))
 		// console.log(vel.x, vel.y)
 		
 		vel = command.copy()
@@ -102,9 +99,6 @@ class Player{
 		if (vel.mag()<10)
 			currStage += 1
 
-		// if (this.pos.x == command.x && this.pos.y == command.y){
-		// 	currStage += 1
-		// }
 	}
 }
 
@@ -160,7 +154,7 @@ class Projectile{
 			let index = obstacles.indexOf(this)
 			obstacles.splice(index, 1)
 			if (!player.won){
-				player.health -= 2
+				player.health -= projectileDamage
 				if (player.health <= 0){
 					player.died = true
 					player.health = 0
@@ -174,6 +168,21 @@ class Projectile{
 
 		this.trail.unshift([this.pos.x, this.pos.y])
 	}
+}
+
+function updateProjectileDamage(){
+	len = 0
+	prev = createVector(0, 0);
+	level.coords.forEach((coord)=>{
+		len += prev.dist(coord)
+		prev = coord
+	})
+	len = Math.ceil(len)
+	len = Math.round(len / playerVel+2) // +2 since assuming length 5 words, player will have 60 dist 
+	//added for every word including space, implying it moves 60/5 => 12 per key press 
+	console.log(len)
+	// projectileDamage = Math.floor(100/(len*towers.length))
+	// console.log(projectileDamage)
 }
 
 function isTowerPosValid(pos){
@@ -250,9 +259,10 @@ function comm(){
 		if (!towerDict[msg]){
 			
 			let towerPos = getTowerPos()
-			t = new Tower(towerPos.x, towerPos.y, msg)
-			towers.push(t)
-			towerDict[msg] = t;
+			let tower = new Tower(towerPos.x, towerPos.y, msg)
+			towers.push(tower)
+			towerDict[msg] = tower;
+			updateProjectileDamage()
 		}
 	})
 
@@ -320,9 +330,11 @@ function restart(){
 	currentIndex = 0
 	player.health = 100
 	player.pos = level.coords[0].copy()
+	obstacles = []
 	towers.forEach(tower=>{
-		tower.pos.x = random(0, width)
-		tower.pos.y = random(0, 400)
+		pos = getTowerPos()
+		tower.pos.x = pos.x
+		tower.pos.y = pos.y
 	})
 }
 
