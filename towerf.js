@@ -153,31 +153,31 @@ function drawText(){
 		currentIndex = 0
 	}
 
-	// let x;
-	// textSize(60)
-	// textFont(font)
-	// fill("#5F9DF788")
-	// textAlign(LEFT)
-	// x = (width/2)-(textWidth(currentWord))/2
-	// text(currentWord, x, 500)
-	
-	// fill("#1746A2ff")
-	// text(currentWord.slice(0, currentIndex)+'', x, 500)
-
 	let x;
+	textSize(60)
+	textFont(font)
+	fill("#5F9DF788")
+	textAlign(LEFT)
+	x = (width/2)-(textWidth(currentWord))/2
+	text(currentWord, x, 500)
 	
-	if (player){
-		textSize(20)
-		textFont(font)
-		// fill("#5F9DF7aa")
-		fill("#1746A277")
-		textAlign(LEFT)
-		x = player.pos.x-(textWidth(currentWord))/2
-		text(currentWord, x, player.pos.y-20)
+	fill("#1746A2ff")
+	text(currentWord.slice(0, currentIndex)+'', x, 500)
+
+	// let x;
+	
+	// if (player){
+	// 	textSize(20)
+	// 	textFont(font)
+	// 	// fill("#5F9DF7aa")
+	// 	fill("#1746A277")
+	// 	textAlign(LEFT)
+	// 	x = player.pos.x-(textWidth(currentWord))/2
+	// 	text(currentWord, x, player.pos.y-20)
 		
-		fill("#1746A2ff")
-		text(currentWord.slice(0, currentIndex)+'', x, player.pos.y-20)
-	}
+	// 	fill("#1746A2ff")
+	// 	text(currentWord.slice(0, currentIndex)+'', x, player.pos.y-20)
+	// }
 
 
 

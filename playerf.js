@@ -154,7 +154,7 @@ class Projectile{
 			let index = obstacles.indexOf(this)
 			obstacles.splice(index, 1)
 			if (!player.won){
-				player.health -= projectileDamage
+				player.health -= 3
 				if (player.health <= 0){
 					player.died = true
 					player.health = 0
@@ -254,26 +254,28 @@ function draw(){
 
 }
 
+socket.on("tower-spawn", msg=>{
+	if (!towerDict[msg]){
+		
+		let towerPos = getTowerPos()
+		let tower = new Tower(towerPos.x, towerPos.y, msg)
+		towers.push(tower)
+		towerDict[msg] = tower;
+		updateProjectileDamage()
+	}
+})
+
+socket.once("fire", msg=>{
+	if (towerDict[msg].canFire){
+		towerDict[msg].fire()
+		towerDict[msg].canFire = false;
+		setTimeout(()=>{towerDict[msg].canFire = true}, 200)
+	}
+})
+
+
 function comm(){
-	socket.on("tower-spawn", msg=>{
-		if (!towerDict[msg]){
-			
-			let towerPos = getTowerPos()
-			let tower = new Tower(towerPos.x, towerPos.y, msg)
-			towers.push(tower)
-			towerDict[msg] = tower;
-			updateProjectileDamage()
-		}
-	})
-
-	socket.once("fire", msg=>{
-		if (towerDict[msg].canFire){
-			towerDict[msg].fire()
-			towerDict[msg].canFire = false;
-			setTimeout(()=>{towerDict[msg].canFire = true}, 200)
-		}
-	})
-
+	
 	socket.emit("msg", [player, towers, obstacles])
 	// console.log('sent', player.pos.x)
 	
@@ -349,10 +351,18 @@ function keyTyped(key){
 	// console.log(currentWord[currentIndex]== key.key)
 }
 
+function createNewLevel(){
+	newLevel = {
+		coords: [[50,50]]
+	}
+}
+
 function keyPressed(){
 	if (player.died || player.won){
 		if (keyCode == ENTER){
 			socket.emit("restart")
+			socket.emit("level")
+			createNewLevel()
 			restart()
 		}
 	}

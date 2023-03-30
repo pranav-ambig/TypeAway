@@ -28,6 +28,10 @@ io.on('connection', (socket)=>{
     io.emit("msg", objs)
   })
 
+  socket.on("level", (objs)=>{
+    io.emit("level", objs)
+  })
+
   socket.on("name-event", msg=>{
     io.emit("tower-spawn", msg)
   })
@@ -45,7 +49,7 @@ io.on('connection', (socket)=>{
 
 })
 
-http.listen(port, () => {
+http.listen(port, '0.0.0.0', () => {
   console.log(`Server running at port:${port}`)
   // console.log(`Player: http://192.168.1.17:${port}/player`);
   // console.log(`Tower: http://192.168.1.17:${port}/tower`);
