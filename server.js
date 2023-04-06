@@ -16,7 +16,7 @@ app.get('/player', (req, res)=>{
 })
 
 app.get('/', (req, res)=>{
-  res.sendFile(__dirname+'/forPlayer.html')
+  res.sendFile(__dirname+'/forTower.html')
 })
 
 // app.get('/', (req, res)=>{
