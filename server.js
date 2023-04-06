@@ -7,20 +7,33 @@ const port = process.env.port || 3000;
 
 app.use(express.static(__dirname))
 
-app.get('/player', (req, res)=>{
-  res.sendFile(__dirname+'/forPlayer.html')
-  // console.log(req.hostname)
-})
+let playerPresent = false;
+
+// app.get('/player', (req, res)=>{
+//   playerPresent = true;
+//   res.sendFile(__dirname+'/forPlayer.html')
+//   // console.log(req.hostname)
+// })
 
 app.get('/', (req, res)=>{
-  res.send("Go to /player for player, /tower for tower")
+  if (!playerPresent){
+    res.sendFile(__dirname+'/forPlayer.html')
+    console.log('player joined')
+    playerPresent = true
+  }
+  else{
+    console.log('tower joined')
+    res.sendFile(__dirname+'/forTower.html')
+  }
+
+  // res.send("Go to /player for player, /tower for tower")
 })
 
-app.get('/tower', (req, res)=>{
-  res.sendFile(__dirname+'/forTower.html')
-  // io.emit("tower-spawn", req.params["tname"])
-  // console.log('test', req.params["tname"])
-})
+// app.get('/tower', (req, res)=>{
+//   res.sendFile(__dirname+'/forTower.html')
+//   // io.emit("tower-spawn", req.params["tname"])
+//   // console.log('test', req.params["tname"])
+// })
 
 io.on('connection', (socket)=>{
   // console.log('connected')

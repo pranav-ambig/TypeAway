@@ -6,6 +6,9 @@ let words
 let currentWord
 let currentIndex = 0
 let cellSize = 30
+let moveTimeOut = 20
+const WIDTH = 600
+const HEIGHT = 600
 
 
 // let socket = io.connect("http://192.168.214.161:8081")
@@ -13,21 +16,31 @@ let socket = io()
 // let socket = io.connect("http://10.20.203.99:8081")
 let dts = [] //data to send
 
+let levelCoords = [
+	[[50, 50],[150, 150],[300,150], [300, 400], [500, 400], [500, 300], [100, 300], [100, 400]],
+	[[100, 100], [500, 100], [500, 250], [400, 200], [200, 200], [200, 300], [100, 300], [100, 400], [300, 400], [300, 300], [400, 300], [400, 400]],
+	[[50, 50], [200, 50], [200, 200], [550, 200], [550, 50], [400, 50], [400, 400], [50, 400]],
+	[[50, 50], [50, 201], [300, 201], [300, 50], [200, 50], [200, 351], [350, 351], [450, 150], [550, 150], [551, 351]]
+]
 
 let level = {
 	// coords: [[50, 50],[150, 150],[300,150], [300, 400], [500, 400], [500, 300], [100, 300], [100, 400]]
 	// coords: [[100, 100], [500, 100], [500, 250], [400, 200], [200, 200], [200, 300], [100, 300], [100, 400], [300, 400], [300, 300], [400, 300], [400, 400]] 
 	coords: [[50, 50], [200, 50], [200, 200], [550, 200], [550, 50], [400, 50], [400, 400], [50, 400]]
+	// coords: [[50, 50], [50, 201], [300, 201], [300, 50], [200, 50], [200, 351], [350, 351], [450, 150], [550, 150], [551, 351]]  
 }
 
-let temp = []
-
-level.coords.forEach(e=>{
-	temp.push(createVector(e[0], e[1]))
-})
-level.coords = temp;
 
 
+function createLevelVectors(){
+	let temp = []
+	level.coords.forEach(e=>{
+		temp.push(createVector(e[0], e[1]))
+	})
+	level.coords = temp;
+}
+
+createLevelVectors()
 let obstacles = []
 let towers = []
 let currStage = 1
@@ -35,8 +48,17 @@ let towerDict = {}
 let playerVel = 10
 let projectileDamage = 0;
 
+function preload() {
+	font = loadFont('Akaju_demo.otf');
+	words = loadStrings('words.txt', ()=>{
+		currentWord = random(words)+' '
+	})
+
+	// console.log(typeof terrain, typeof terrainImg)
+}
+
 function setup(){
-	createCanvas(600, 600)
+	createCanvas(WIDTH, HEIGHT)
 	rectMode(CENTER)
 	player = new Player()
 	// updateProjectileDamage()
@@ -46,14 +68,14 @@ function setup(){
 	// keyTyped({key: 'n'})
 }
 
-
-
 class Player{
 	constructor(){
 		this.health = 100
 		this.pos = level.coords[0].copy()
 		this.died = false
 		this.won = false
+		this.moving = false
+		this.moveTimeOut = moveTimeOut
 	}
 
 	draw(){
@@ -87,21 +109,27 @@ class Player{
 	
 		let command = level.coords[currStage]
 		// console.log(level.coords[0].x)
-		
 		let vel = command.copy()
-		vel.sub(this.pos)
-		vel.normalize()
-		this.pos.add(vel.mult(playerVel))
-		// console.log(vel.x, vel.y)
+		if (this.moveTimeOut > 0 && this.moving){
+			vel.sub(this.pos)
+			vel.normalize()
+			this.pos.add(vel.mult(1))
+			this.moveTimeOut -= 1
+		}
+		else {
+			this.moveTimeOut = moveTimeOut
+			this.moving = false
+		}
+		// this.pos.add(vel.mult(playerVel))
+		
 		
 		vel = command.copy()
 		vel.sub(this.pos)
-		if (vel.mag()<10)
+		if (vel.mag() < 0.5)
 			currStage += 1
 
 	}
 }
-
 
 class Tower{
 	constructor(x, y, name){
@@ -237,9 +265,13 @@ function testing(){
 
 function draw(){
 	background("#FFF7E9")
+	// for (let i=0; i<WIDTH/cellSize; i++){
+	// 	image(terrain, cellSize*i, 0, terrain.width, terrain.height)
+	// }
 	frameRate(60)
 	drawLevel()
 	player.draw()
+	player.move()
 	towers.forEach((e)=>{
 		e.draw()
 	})
@@ -262,10 +294,11 @@ socket.on("tower-spawn", msg=>{
 		towers.push(tower)
 		towerDict[msg] = tower;
 		updateProjectileDamage()
+		// socket.emit('level', level.coords)
 	}
 })
 
-socket.once("fire", msg=>{
+socket.on("fire", msg=>{
 	if (towerDict[msg].canFire){
 		towerDict[msg].fire()
 		towerDict[msg].canFire = false;
@@ -276,7 +309,7 @@ socket.once("fire", msg=>{
 
 function comm(){
 	
-	socket.emit("msg", [player, towers, obstacles])
+	socket.emit("msg", [player, towers, obstacles, level.coords])
 	// console.log('sent', player.pos.x)
 	
 }
@@ -294,13 +327,6 @@ function drawLevel(){
 	}
 	noStroke();
 	
-}
-
-function preload() {
-	font = loadFont('Akaju_demo.otf');
-	words = loadStrings('words.txt', ()=>{
-		currentWord = random(words)+' '
-	})
 }
 
 function drawText(){
@@ -322,6 +348,8 @@ function drawText(){
 	
 	fill("#1746A2ff")
 	text(currentWord.slice(0, currentIndex)+'', x, 500)
+
+	// text(player.moveTimeOut.toString().replace(/0/g, "O"), x, 550)
 }
 
 function restart(){
@@ -332,6 +360,8 @@ function restart(){
 	currentIndex = 0
 	player.health = 100
 	player.pos = level.coords[0].copy()
+	player.moving = false
+	player.moveTimeOut = moveTimeOut
 	obstacles = []
 	towers.forEach(tower=>{
 		pos = getTowerPos()
@@ -345,7 +375,10 @@ function keyTyped(key){
 	if (!player.died){
 		if (key.key === currentWord[currentIndex]){
 			currentIndex += 1
-			player.move()
+			if (player.moving)
+				player.moveTimeOut += 10
+			player.moving = true
+			// player.move()
 		}
 	}
 	// console.log(currentWord[currentIndex]== key.key)
@@ -361,8 +394,11 @@ function keyPressed(){
 	if (player.died || player.won){
 		if (keyCode == ENTER){
 			socket.emit("restart")
-			socket.emit("level")
-			createNewLevel()
+			// createNewLevel()
+			level.coords = levelCoords[Math.floor(Math.random()*levelCoords.length)]
+			socket.emit("level", level.coords)
+			createLevelVectors()
+			// console.log(level.coords)
 			restart()
 		}
 	}

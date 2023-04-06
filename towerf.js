@@ -23,13 +23,14 @@ let level = {
 	// coords: [[50, 250],[250, 250],[250, 400], [500, 400]]
 }
 
-let temp = []
-
-level.coords.forEach(e=>{
-	temp.push(createVector(e[0], e[1]))
-})
-level.coords = temp;
-
+function createLevelVectors(){
+	let temp = []
+	level.coords.forEach(e=>{
+		temp.push(createVector(e[0], e[1]))
+	})
+	level.coords = temp;
+}
+createLevelVectors()
 
 
 let player;
@@ -89,6 +90,7 @@ function draw(){
 				circle(b[0], b[1], r)
 			})
 		})
+		level.coords = data[3]
 	}
 	drawText()
 	comm()
@@ -116,7 +118,6 @@ function comm(){
 	socket.on("restart", ()=>{
 		currentWord = random(words) +' '
 		currentIndex = 0
-
 	})
 }
 

@@ -941,8 +941,6 @@ proper
 bar
 offer
 segment
-slave
-fuck
 duck
 instant
 market
