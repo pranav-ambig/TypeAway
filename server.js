@@ -9,25 +9,29 @@ app.use(express.static(__dirname))
 
 let playerPresent = false;
 
-// app.get('/player', (req, res)=>{
-//   playerPresent = true;
-//   res.sendFile(__dirname+'/forPlayer.html')
-//   // console.log(req.hostname)
-// })
+app.get('/player', (req, res)=>{
+  playerPresent = true;
+  res.sendFile(__dirname+'/forPlayer.html')
+  // console.log(req.hostname)
+})
 
 app.get('/', (req, res)=>{
-  if (!playerPresent){
-    res.sendFile(__dirname+'/forPlayer.html')
-    console.log('player joined')
-    playerPresent = true
-  }
-  else{
-    console.log('tower joined')
-    res.sendFile(__dirname+'/forTower.html')
-  }
-
-  // res.send("Go to /player for player, /tower for tower")
+  res.sendFile(__dirname+'/forPlayer.html')
 })
+
+// app.get('/', (req, res)=>{
+//   if (!playerPresent){
+//     res.sendFile(__dirname+'/forPlayer.html')
+//     console.log('player joined')
+//     playerPresent = true
+//   }
+//   else{
+//     console.log('tower joined')
+//     res.sendFile(__dirname+'/forTower.html')
+//   }
+
+//   // res.send("Go to /player for player, /tower for tower")
+// })
 
 // app.get('/tower', (req, res)=>{
 //   res.sendFile(__dirname+'/forTower.html')
