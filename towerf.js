@@ -8,7 +8,12 @@ let currentIndex = 0
 let cellSize = 30
 let nameSent = false
 let nameToSend = ""
+let ridSent = false
+let rid = ""
 let died = false;
+
+const WIDTH = 600
+const HEIGHT = 600
 
 
 let data = []
@@ -38,7 +43,7 @@ let currStage = 1
 
 
 function setup(){
-	createCanvas(600, 600)
+	createCanvas(WIDTH, HEIGHT)
 	rectMode(CENTER)
 
 }
@@ -49,6 +54,11 @@ function draw(){
 	
 	if (!nameSent){
 		sendName()
+		return;
+	}
+
+	if (!ridSent){
+		sendRid()
 		return;
 	}
 
@@ -94,6 +104,18 @@ function draw(){
 	}
 	drawText()
 	comm()
+}
+
+function sendRid(){
+	//get and send Room id
+	textSize(40)
+	textFont(font)
+	fill("#1746A2ff")
+	textAlign(LEFT)
+	x = (width/2)-(textWidth("Join room id:"))/2
+	text("Join room id:", x, height/2-50)
+	x = (width/2)-(textWidth(rid))/2
+	text(rid, x, height/2)
 }
 
 function sendName(){
@@ -165,6 +187,11 @@ function drawText(){
 	fill("#1746A2ff")
 	text(currentWord.slice(0, currentIndex)+'', x, 500)
 
+	// draw rid
+	textSize(20);
+	textAlign(CENTER)
+	text("Room ID: "+rid, WIDTH/2, HEIGHT-20-4)
+
 	// let x;
 	
 	// if (player){
@@ -188,7 +215,19 @@ function drawText(){
 function keyTyped(key){
 
 	if (!nameSent){
-		nameToSend += key.key
+		if (key.key != "Enter"){
+
+			// console.log('hit', key)
+			nameToSend += key.key
+		}
+	}
+
+	else if (nameSent && !ridSent){
+		if (key.key != "Enter"){
+
+			// console.log('hit', key)
+			rid += key.key
+		}
 	}
 
 	if (key.key === currentWord[currentIndex]){
@@ -199,11 +238,23 @@ function keyTyped(key){
 
 function keyPressed(){
 	if (keyCode == BACKSPACE){
-		nameToSend = nameToSend.slice(0, -1)
+		if (!nameSent)
+			nameToSend = nameToSend.slice(0, -1)
+		else
+			rid = rid.slice(0, -1)
 	}
 	else if (keyCode == ENTER){
-		socket.emit("name-event", nameToSend)
-		nameSent = true;
-		currentIndex = 0;
+		if (!nameSent){
+			nameSent = true;
+		}
+		else {
+			socket.emit("join-room", [rid, nameToSend])
+			ridSent = true;
+
+			socket.emit("name-event", nameToSend)
+			// nameSent = true;
+			currentIndex = 0;
+			// rid = ""
+		}
 	}
 }

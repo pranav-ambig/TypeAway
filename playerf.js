@@ -47,6 +47,9 @@ let currStage = 1
 let towerDict = {}
 let playerVel = 10
 let projectileDamage = 0;
+let ridSent = false;
+let rid = ""
+
 
 function preload() {
 	font = loadFont('Akaju_demo.otf');
@@ -265,6 +268,13 @@ function testing(){
 
 function draw(){
 	background("#FFF7E9")
+
+	if (!ridSent){
+		// console.log("riddd")
+		sendRid()
+		return
+	}
+
 	// for (let i=0; i<WIDTH/cellSize; i++){
 	// 	image(terrain, cellSize*i, 0, terrain.width, terrain.height)
 	// }
@@ -298,6 +308,17 @@ socket.on("tower-spawn", msg=>{
 	}
 })
 
+socket.on("tower-despawn", msg=>{
+	let towerToBeDeleted = towerDict[msg]
+	let ind = towers.findIndex((x)=>x == towerToBeDeleted)
+	towers.splice(ind, 1)
+	// towerDict["msg"] = undefined
+	delete towerDict[msg]
+	console.log("towers", towers)
+	console.log("towerDict", towerDict)
+
+})
+
 socket.on("fire", msg=>{
 	if (towerDict[msg].canFire){
 		towerDict[msg].fire()
@@ -312,6 +333,18 @@ function comm(){
 	socket.emit("msg", [player, towers, obstacles, level.coords])
 	// console.log('sent', player.pos.x)
 	
+}
+
+function sendRid(){
+	//get and send Room id
+	textSize(40)
+	textFont(font)
+	fill("#1746A2ff")
+	textAlign(LEFT)
+	x = (width/2)-(textWidth("Create room id:"))/2
+	text("Create room id:", x, height/2-50)
+	x = (width/2)-(textWidth(rid))/2
+	text(rid, x, height/2)
 }
 
 function drawLevel(){
@@ -343,16 +376,25 @@ function drawText(){
 	textFont(font)
 	fill("#5F9DF788")
 	textAlign(LEFT)
-	x = (width/2)-(textWidth(currentWord))/2
+	x = (WIDTH/2)-(textWidth(currentWord))/2
 	text(currentWord, x, 500)
 	
 	fill("#1746A2ff")
 	text(currentWord.slice(0, currentIndex)+'', x, 500)
+	
+
+	// draw rid
+	textSize(20);
+	textAlign(CENTER)
+	text("Room ID: "+rid, WIDTH/2, HEIGHT-20-4)
 
 	// text(player.moveTimeOut.toString().replace(/0/g, "O"), x, 550)
 }
 
 function restart(){
+	level = {coords: random(levelCoords)}
+	createLevelVectors()
+
 	player.won = false
 	player.died = false
 	currStage = 1
@@ -371,6 +413,11 @@ function restart(){
 }
 
 function keyTyped(key){
+	
+	if (!ridSent){
+		rid += key.key
+		return;
+	}
 
 	if (!player.died){
 		if (key.key === currentWord[currentIndex]){
@@ -381,6 +428,7 @@ function keyTyped(key){
 			// player.move()
 		}
 	}
+	
 	// console.log(currentWord[currentIndex]== key.key)
 }
 
@@ -401,5 +449,15 @@ function keyPressed(){
 			// console.log(level.coords)
 			restart()
 		}
+	}
+	else if (keyCode == BACKSPACE){
+		if (!ridSent)
+			rid = rid.slice(0, -1)
+	}
+	else if (keyCode == ENTER){
+		// console.log(rid)
+		socket.emit("join-room-player", rid)
+		ridSent = true;
+		currentIndex = 0;
 	}
 }

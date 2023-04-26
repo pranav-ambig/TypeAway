@@ -1,4 +1,5 @@
 const express = require('express');
+const { jsonc } = require('jsonc');
 const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
@@ -7,7 +8,6 @@ const port = process.env.port || 3000;
 
 app.use(express.static(__dirname))
 
-let playerPresent = false;
 
 app.get('/player', (req, res)=>{
   playerPresent = true;
@@ -16,6 +16,10 @@ app.get('/player', (req, res)=>{
 })
 
 app.get('/', (req, res)=>{
+  res.sendFile(__dirname+'/forTower.html')
+})
+
+app.get('/tower', (req, res)=>{
   res.sendFile(__dirname+'/forTower.html')
 })
 
@@ -39,30 +43,87 @@ app.get('/', (req, res)=>{
 //   // console.log('test', req.params["tname"])
 // })
 
+let rids = {};
+let names = {};
+
 io.on('connection', (socket)=>{
   // console.log('connected')
+
+  
+  // console.log(socket)
+  let strSocket = jsonc.stringify(socket)
+
+  let intervalID = setInterval(()=>{
+    if (socket.disconnected){
+      // console.log('disconnected')
+      // console.log(names[strSocket])
+      io.to(rids[strSocket]).emit("tower-despawn", names[strSocket])
+      delete rids[strSocket]
+      delete names[strSocket]
+      clearInterval(intervalID)
+      delete socket
+    }
+  }, 50)
+
+  socket.on("join-room-player", rid=>{
+    // console.log(data)
+    if (rid != ""){
+      socket.join(rid)
+      rids[strSocket] = rid
+    }
+  })
+
+  socket.on("join-room", data=>{
+    let rid = data[0]
+    let name = data[1]
+    // console.log(data)
+    if (rid != "" && name != ""){
+      socket.join(rid)
+      // let dto = {"socket":socket}  
+      rids[strSocket] = rid
+      names[strSocket] = name
+      // console.log(rids)
+    }
+  })
+
   socket.on("msg", (objs)=>{
-    io.emit("msg", objs)
+    // Object.entries(rids).forEach(e=>console.log(count, e[1]))
+    // count += 1
+    
+    // let strSocket = jsonc.stringify(socket)
+    io.to(rids[strSocket]).emit("msg", objs)
+    
   })
 
   socket.on("level", (objs)=>{
-    io.emit("level", objs)
+    // let strSocket = jsonc.stringify(socket)
+    io.to(rids[strSocket]).emit("level", objs)
   })
 
   socket.on("name-event", msg=>{
-    io.emit("tower-spawn", msg)
+    // let strSocket = jsonc.stringify(socket)
+    io.to(rids[strSocket]).emit("tower-spawn", msg)
   })
 
   socket.on("fire", msg=>{
-    io.emit("fire", msg)
+    // let strSocket = jsonc.stringify(socket)
+    io.to(rids[strSocket]).emit("fire", msg)
     // console.log(msg, "fired")
   })
 
   socket.on("died", ()=>{
-    io.emit("died")
+    // let strSocket = jsonc.stringify(socket)
+    io.to(rids[strSocket]).emit("died")
   })
 
-  socket.on("restart", ()=>io.emit("restart"))
+  // socket.on("disconnect", ()=>{
+  //   // let strSocket = jsonc.stringify(socket)
+  //   io.to(rids[strSocket]).emit("disconnect", names[strSocket])
+  // })
+
+  socket.on("restart", ()=>{
+    // let strSocket = jsonc.stringify(socket)
+    io.to(rids[strSocket]).emit("restart")})
 
 })
 
