@@ -7,6 +7,7 @@ let currentWord
 let currentIndex = 0
 let cellSize = 30
 let moveTimeOut = 20
+let canvas
 const WIDTH = 600
 const HEIGHT = 600
 
@@ -61,7 +62,7 @@ function preload() {
 }
 
 function setup(){
-	createCanvas(WIDTH, HEIGHT)
+	canvas = createCanvas(WIDTH, HEIGHT)
 	rectMode(CENTER)
 	player = new Player()
 	// updateProjectileDamage()
