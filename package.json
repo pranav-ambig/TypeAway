@@ -1,0 +1,20 @@
+{
+  "name": "typeaway",
+  "version": "1.0.0",
+  "description": "TypeAway, a multiplayer game aiming to make typing fun, by blasting your friends :)",
+  "main": "choose.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pranav-ambig/TypeAway.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pranav-ambig/TypeAway/issues"
+  },
+  "homepage": "https://github.com/pranav-ambig/TypeAway#readme"
+}
